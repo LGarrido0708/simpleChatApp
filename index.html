@@ -1,0 +1,357 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,html {
+      background: rgb(121, 119, 121);
+    }
+
+    form {
+      background: #000;
+      padding: 3px;
+      position: fixed;
+      bottom: 0;
+    }
+
+    form input {
+      border: 0;
+      padding: 10px;
+      width: 50%;
+      margin-right: .5%;
+    }
+
+    form button {
+      width: 14%;
+      background:rgb(7, 57, 221);
+      border: none;
+      padding: 10px;
+      color: white;
+    }
+
+    #messages {
+      text-align: left;
+      font-family: Arial, Helvetica, sans-serif;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+
+    #messages {
+      margin-bottom: 40px
+    }
+
+    #name {
+      outline: 0;
+      border-width: 0 0 2px;
+      border-color: rgb(255, 255, 255);
+      margin-top: 5%;
+      text-align: center;
+      font-size: 30px;
+      background-color: black;
+      color: white;
+      height: 70px;
+      opacity: 0.7;
+    }
+
+    #name:focus {
+      border-color: rgb(255, 0, 255)
+    }
+
+    #main {
+      display: none;
+      margin-bottom: 10%;
+    }
+
+    .button {
+      background-color: rgb(7, 57, 221);
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      margin-bottom: 20%;
+    }
+
+    #span{
+      font-size: 20px;
+      color: white;
+    }
+
+    #form {
+      background-color: black;
+      opacity: 0.7;
+      color: white;
+      height: 70px;
+      width: 40%;
+      margin-bottom: 2%
+    }
+
+    #chat {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: rgb(14, 205, 253);
+      width: 40%;
+      margin-right: 4%;
+      margin-right: 10%;
+    }
+
+    #m {
+      margin-top: 1%;
+    }
+
+    .container {
+    background-color: #F2F2F2;
+    border-radius: 5px;
+    padding: 10px;
+    float: left;
+    width: 50%;
+    margin: 10px 0;
+    margin-left: 2%;
+    margin: 5px 20px 5px 45px; 
+ 
+    }
+    .containerright {
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+      width: 50%;
+      float: right;
+      margin-right: 2%;
+      color:black;
+      margin: 5px 45px 5px 20px; 
+      
+    }    
+
+    .container::before {
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px;           
+}
+
+.containerright::before {
+    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
+    right: -9px;    
+}
+
+
+    #btn {
+      background-color: rgb(7, 57, 221);
+      border: none;
+      color: rgb(255, 255, 255);
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+
+    #sender {
+      float: left;
+    }
+    .card {
+            margin: 0 auto; /* Added */
+            float: none; /* Added */
+            margin-bottom: 10px; /* Added */
+    }
+    #nickname {
+      background-color: rgb(14, 205, 253);
+    }
+  #container {
+    background-color: rgb(0, 152, 253);
+        margin: 0 auto; /* Added */
+        float: none; /* Added */
+        margin-bottom: 10px; /* Added */
+  }
+
+  .card-body {
+    background-color: #D6EAF8;
+  }
+
+    #chatmate {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 30px;
+    }
+
+    #divspan {
+      background-color: rgb(255, 253, 255);
+      color: rgb(255, 0, 0);
+    }
+   #container {
+     width: 40%;
+     border-radius: 5%;
+     background-color:white;
+   }
+
+   .bubble{
+    background-color: #F2F2F2;
+    border-radius: 5px;
+    box-shadow: 0 0 6px #B2B2B2;
+    display: inline-block;
+    padding: 10px 18px;
+    position: relative;
+    vertical-align: top;
+}
+.bubble::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+}
+
+  </style>
+
+
+</head>
+
+<body>
+  <br><br>
+  <div id="container">
+    <div class="card-deck">
+      <div class="card bg-sucess">
+        <div class="login">
+          <div>
+            <center><img src="https://peoplepng.com/wp-content/uploads/2019/02/logo-chat-png-3.png" style="height:40%; width:40%;"></center>
+          </div>
+          <div id="nickname">
+            <center><input id="name" autocomplete="off" type="text" placeholder="Username..." required /></center>
+            <br><br><br>
+            <center><button id="btn" class="btn btn-outline-info btn-lg">Log In</button></center><br><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <center>
+    <div id="chat">
+      <div id='divspan'>
+        <span id="span"></span>
+        <center><span id="chatmate"></span></center>
+      </div>
+      <div style="background-color: rgb(121, 119, 121);">
+        <ul class="users-list">
+          
+        </ul>
+      </div>
+      <div id="main">
+        <ul id="messages">
+        </ul>
+
+        <form id='form'>
+          <span id="typing">
+          </span><br>
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+
+      </div>
+    </div>
+  </center>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var socket = io();
+      var users = [];
+      var username = $('#name').val();
+      $('form').submit(function () {
+        socket.emit('chat message', { username: $('#name').val(), msg: $('#m').val() });
+        $('#m').val('');
+        return false;
+      });
+
+      $('#name').submit(function () {
+        socket.emit('add user', username);
+      });
+
+      $("#m").on("input", function () {
+        socket.emit('typing');
+      })
+
+
+
+      socket.on('getOnline', function (users) {
+        $(".users-list").empty()
+        users.forEach(user => {
+          $(".users-list").append($("<h3>", { id: user }).text(user  + " is online"))
+        });
+      });
+
+      socket.on('logout', function (username) {
+        $(".getOnline").find("#" + username).remove()
+      })
+
+      socket.on('typing', function (data) {
+        $('#typing').html("")
+        var handler = data.username + " is typing";
+        if (data.username != $('#name').val() && data.msg != "") {
+            $('#typing').html(handler)
+        } if (data.username == null) {
+          $('#typing').html("")
+        }
+      })
+
+
+
+
+      socket.on('chat message', function (data) {
+        console.log(data);
+        if (data.username == $('#name').val()) {
+          $('#messages').append($("<ul/>", { class: "bubble containerright" }).text(data.msg))
+        } else {
+          $('#messages').append($("<ul/>", { class: "bubble container" }).text(data.msg))
+        }
+
+
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+
+
+
+      document.getElementById('btn').addEventListener("click", function () {
+        if (document.getElementById('name').value == '') {
+          document.getElementById('span').innerHTML = swal("Nickname Required!");
+          document.getElementById('span').style.display = 'none';
+        } else {
+          document.getElementById('main').style.display = 'block';
+          document.getElementById('container').style.display = 'none';
+          document.getElementById('nickname').style.display = 'none';
+          document.getElementById('chatmate').textContent = "Welcome!"
+          usernamei = $("#name").val()
+          socket.emit('add user', usernamei);
+          socket.emit('typing', usernamei)
+        }
+      })
+
+      function name() {
+        var name = document.getElementById('name').value;
+        return name;
+      }
+    });
+
+  </script>
+</body>
+
+</html>
